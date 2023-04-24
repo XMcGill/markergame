@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset=utf-8 />
+    <title>Great Challenge Part A</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.4.0/dist/leaflet.css" />
+<script src="https://unpkg.com/leaflet@1.4.0/dist/leaflet.js"></script>
+    <link href='http://fonts.googleapis.com/css?family=Lato' rel='stylesheet' type='text/css'>
+
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: whitesmoke;
+            font-family: Lato, sans-serif;
+            color: #0D0000;
+        }
+        header {
+            padding: 6px 10%;
+        }
+        h1 {
+            display: inline-block;
+            margin-right: 20px;
+            color: #001323;
+        }
+        h2 {
+            display: inline-block;
+            color: #001323;
+        }
+        #map {
+            width: 80%;
+            height: 540px;
+            margin: 10px auto;
+        }
+        footer {
+            padding: 6px 10%;
+            width: 80%;
+        }
+        p {
+            font-size: 1em;
+            color: #001323;
+        }
+        /* Additional style rules go here! */
+        
+    </style>
+</head>
+
+<body>
+    <header>
+        <h1>Great Challenge Part A:</h1>
+        <h2>Location Hunt!</h2>
+    </header>
+
+    <div id='map'></div>
+
+    <footer>
+        <p>Map authored by Alexandra McGill</p>
+        <p>Click around the map to find the Hidden Location!</p>
+        <p>
+        </p>
+    </footer>
+
+    <script>
+        
+   
+    var options = {
+            center: [30, 30],
+            zoom: 2
+    }
+    
+    var map = L.map('map', options);
+        
+    var tiles =  L.tileLayer('https://stamen-tiles-{s}.a.ssl.fastly.net/terrain/{z}/{x}/{y}.{ext}', {
+	attribution: 'Map tiles by <a href="http://stamen.com">Stamen Design</a>, <a href="http://creativecommons.org/licenses/by/3.0">CC BY 3.0</a> &mdash; Map data &copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
+	subdomains: 'abcd',
+	minZoom: 0,
+	maxZoom: 18,
+	ext: 'png'
+});
+    map.addLayer(tiles);
+    
+//CREATING MARKER       
+   var secretMarker = L.latLng(-33.8566062, 151.2153074); //Create Pat's Marker Lat Lng Object
+        
+    var operaHouse = L.marker(secretMarker, {
+        icon : L.icon({
+            iconUrl: 'secretlocation.png',
+            iconSize: [40, 36],
+            opacity: 0
+        })
+    })
+    operaHouse.bindPopup("You found the Hidden Location! It's the Sydney Opera House!")
+                 
+    
+    var markers = L.layerGroup().addTo(map); //Creates an empty Layer Group
+        
+        
+   map.on('click', function(e){ // PART 2 Handler user clicks on map executes e.... e is the object created through the click - we want the lat lon - thus e.latlng - were consoe logging it. ... we are then createing a marker L.Marker - but it will have the coordinates of teh click - e.latlng - we are then adding options we wish in this case - making it draggabe.... but nothing happens - what the fuck. We have to create a new handler for the drag end - and also the function for distance.
+       
+       
+        markers.clearLayers(); //Clears Layers when Things are started - this cleans of markers when we click 
+   
+       var clickCoord = e.latlng; 
+       console.log(e.latlng)
+       var marker = L.marker(clickCoord, {
+            draggable: 'true'
+        });
+       
+        marker.addTo(markers);
+        marker.addTo(map);
+        
+        marker.on('dragend', function(e){
+            map.removeLayer(marker)
+        });
+       
+       var miles = calcDistance(secretMarker, clickCoord) /// Function Caller - takes information from PatsMarker and click coord click oject lat lon
+  console.log(miles) // CONSOLE LOG OF CLICK!!!
+
+    // PART 3 FUNCTION FOR DISTANCE
+    function calcDistance(secret, click) {  
+            var distance = secretMarker.distanceTo(click)/1609.34
+            return distance
+            }
+        
+      
+      if (e.latlng==secretMarker.latlng) {
+
+       
+        } else if (miles <250) {
+        marker.remove()
+        operaHouse.addTo(map)
+        }else if (miles < 2000) {
+            marker.bindPopup("You're hot!").openPopup()
+        } else if (miles >= 2000 && miles < 4000){
+            marker.bindPopup("You're warm.").openPopup()
+        } else if (miles >= 5000 && miles < 7000){
+            marker.bindPopup("You're cold.").openPopup()
+        } else if (miles >= 7000 && miles < 10000){
+            marker.bindPopup("You're super cold.").openPopup()
+        } else {
+            marker.bindPopup("You're freezing.").openPopup()
+        } 
+
+        });
+
+                  
+    </script>
+    
+</body>
+
+</html>
